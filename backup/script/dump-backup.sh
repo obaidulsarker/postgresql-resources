@@ -2,7 +2,7 @@
 PGDUMP=/usr/pgsql-14/bin/pg_dump
 PSQL=/usr/pgsql-14/bin/psql
 PORT=5432
-BACKUP_LOCATION=/backup
+BACKUP_LOCATION=/backup/dump
 LOGFILE=$BACKUP_LOCATION/dbBackup.log
 DB_NAME=db1
 BACKUP_FILENAME=$DB_NAME-$(date +%F_%H-%M-%S).dump

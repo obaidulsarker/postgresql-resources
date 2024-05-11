@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LOC=/backup;
+LOC=/backup/dump;
 LOGLOC=$LOC;
 LOGFILE=$LOGLOC/removeBackup.log;
 DBNAME=db1;
