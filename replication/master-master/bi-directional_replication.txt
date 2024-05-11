@@ -1,0 +1,205 @@
+
+Servers:
+-------------------------------------
+Node1: 10.42.65.225
+Node2: 10.42.65.226
+Node3: 10.42.65.247
+
+
+Step-1: Install PostgreSQL 16 to all nodes
+-----------------------------------------------
+
+sudo sh -c 'echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+sudo apt-get update
+sudo apt-get -y install postgresql-16
+
+
+service postgresql restart
+
+Step2: Change Postgresql.conf file to all node and restart the server.
+----------------------------------------------------------------------
+
+vim /etc/postgresql/16/main/postgresql.conf
+------------------------------------------
+listen_addresses ='*'
+
+wal_level = logical
+-----------------------------------------
+
+service postgresql restart
+
+Step3: Change hba.conf file to all node and reload the service.
+----------------------------------------------------------------
+
+vim /etc/postgresql/16/main/pg_hba.conf
+-----------------------------------------------------------------------------
+host    all             all             0.0.0.0/0               scram-sha-256
+
+
+host    replication     all             10.42.65.225/32         scram-sha-256
+host    replication     all             10.42.65.226/32         scram-sha-256
+host    replication     all             10.42.65.247/32         scram-sha-256
+
+-------------------------------------------------------------------------------
+service postgresql reload
+
+Step4: Check version of Postgresql database in each nodes.
+----------------------------------------------------------
+sudo -i
+su - postgres
+psql
+select version();
+
+-- Change Postgre user password.
+ALTER ROLE postgres PASSWORD '12345';
+
+Step5: Create a database and Restore schema in all nodes.
+---------------------------------------------------------
+
+CREATE DATABASE fusionpbx;
+\l
+exit
+
+-- Restore Dump to all nodes.
+pg_restore --host localhost --port 5432 --username "postgres" --password --dbname fusionpbx -v /tmp/fusionpbx_pgsql_schema.sql
+
+
+Step6: Find tables which do not have primary key constraints.
+--------------------------------------------------------------
+
+sudo -i
+su - postgres
+psql fusionpbx
+
+SELECT table_schema, table_name
+FROM information_schema.tables
+WHERE table_schema IN ('public')
+  AND table_type = 'BASE TABLE'
+  AND table_name NOT IN (
+    SELECT conrelid::regclass::text
+    FROM pg_constraint
+    WHERE contype = 'p'
+  )
+ORDER BY table_schema, table_name;
+
+
+-- If found, please add primary key constraints.
+ALTER TABLE version ADD constraint pk_version PRIMARY KEY (table_name);
+
+
+Step6: Create PUBLICATION to all nodes for fusionpbx database.
+--------------------------------------------------------------
+
+Node1:
+psql fusionpbx
+CREATE PUBLICATION node1_fpbx_pub FOR ALL TABLES;
+
+Node2:
+psql fusionpbx
+CREATE PUBLICATION node2_fpbx_pub FOR ALL TABLES;
+
+Node3:
+psql fusionpbx
+CREATE PUBLICATION node3_fpbx_pub FOR ALL TABLES;
+
+
+Step7: Create SUBSCRIPTION to Node2 and Node3 for the publication node1_fpbx_pub of node1.
+------------------------------------------------------------------------------------------
+
+Node2:
+psql fusionpbx
+CREATE SUBSCRIPTION node2_fpbx_sub_node1_fpbx_pub CONNECTION 'host=10.42.65.225 port=5432 dbname=fusionpbx user=postgres password=12345'
+PUBLICATION node1_fpbx_pub WITH (copy_data=false, origin = none);
+
+Node3:
+psql fusionpbx
+CREATE SUBSCRIPTION node3_fpbx_sub_node1_fpbx_pub CONNECTION 'host=10.42.65.225 port=5432 dbname=fusionpbx user=postgres password=12345'
+PUBLICATION node1_fpbx_pub WITH (copy_data=false, origin = none);
+
+
+Step8: Now test the node1_fpbx_pub publication of node1.
+-----------------------------------------------------------
+
+Node1:
+psql fusionpbx
+
+-- Insert records into version table and check the synchronization to other nodes.
+INSERT INTO version VALUES('test1',1);
+
+UPDATE version SET table_version=2 WHERE table_name ='test1';
+
+DELETE FROM version WHERE table_name ='test1';
+
+Node2 and Node3: Check data synchronization.
+psql fusionpbx
+SELECT * FROM version;
+
+Step9: Create SUBSCRIPTION to Node1 and Node3 for the publication node2_fpbx_pub of node2.
+-----------------------------------------------------------------------------------------
+Node1:
+psql fusionpbx
+
+CREATE SUBSCRIPTION node1_fpbx_sub_node2_fpbx_pub CONNECTION 'host=10.42.65.226 port=5432 dbname=fusionpbx user=postgres password=12345'
+PUBLICATION node2_fpbx_pub WITH (copy_data=false, origin = none);
+
+Node3:
+psql fusionpbx
+
+CREATE SUBSCRIPTION node3_fpbx_sub_node2_fpbx_pub CONNECTION 'host=10.42.65.226 port=5432 dbname=fusionpbx user=postgres password=12345'
+PUBLICATION node2_fpbx_pub WITH (copy_data=false, origin = none);
+
+
+Step10: Now test the node2_fpbx_pub publication of node2.
+---------------------------------------------------------
+
+Node2:
+psql fusionpbx
+
+-- Insert records into version table and check the synchronization to other nodes.
+INSERT INTO version VALUES('test2',1);
+
+UPDATE version SET table_version=2 WHERE table_name ='test2';
+
+DELETE FROM version WHERE table_name ='test2';
+
+Node1 and Node3: Check data synchronization. 
+
+SELECT * FROM version;
+
+
+Step11: Create SUBSCRIPTION to Node1 and Node2 for the publication node3_fpbx_pub of node3.
+-----------------------------------------------------------------------------------------
+
+Node1:
+psql fusionpbx
+
+CREATE SUBSCRIPTION node1_fpbx_sub_node3_fpbx_pub CONNECTION 'host=10.42.65.247 port=5432 dbname=fusionpbx user=postgres password=12345'
+PUBLICATION node3_fpbx_pub WITH (copy_data=false, origin = none);
+
+Node2:
+psql fusionpbx
+
+CREATE SUBSCRIPTION node2_fpbx_sub_node3_fpbx_pub CONNECTION 'host=10.42.65.247 port=5432 dbname=fusionpbx user=postgres password=12345'
+PUBLICATION node3_fpbx_pub WITH (copy_data=false, origin = none);
+
+
+Step12: Now test the node3_fpbx_pub publication of node3.
+-----------------------------------------------------------
+
+Node3:
+
+psql fusionpbx
+
+-- Insert records into version table and check the synchronization to other nodes.
+INSERT INTO version VALUES('test3',1);
+
+UPDATE version SET table_version=2 WHERE table_name ='test3';
+
+DELETE FROM version WHERE table_name ='test3';
+
+Node1 and Node2: Check data synchronization. 
+
+psql fusionpbx
+
+SELECT * FROM version;
