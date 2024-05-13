@@ -4,7 +4,6 @@ PORT=5432
 BACKUP_LOCATION=/backup/dump
 LOGFILE=$BACKUP_LOCATION/dbBackup.log
 DB_NAME=db1
-BACKUP_FILENAME=$DB_NAME-$(date +%F_%H-%M-%S).dump
 BACKUP_USER=postgres
 BACKUP_PASS='xxxxxxxxxx'
 HOST=xx.xx.xx.xx
