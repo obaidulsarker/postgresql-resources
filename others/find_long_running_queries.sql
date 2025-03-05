@@ -1,3 +1,5 @@
+-- SELECT pg_terminate_backend(PID);
+
 SELECT a.datname,
          l.relation::regclass,
          l.transactionid,
