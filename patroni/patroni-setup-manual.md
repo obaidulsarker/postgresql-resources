@@ -2,7 +2,7 @@
 
 |Author: | MD OBAIDUL HAQUE SARKER |    
 |:-----------|:-------------------------|
-| Email:    | aupo37@gmailcom         |
+| Email:    | aupo37@gmail.com         |
 | LinkedIn: | https://www.linkedin.com/in/md-obaidul-haque-sarker-5b983b26 |
 | Github: | https://github.com/obaidulsarker |
 | Created On: | 04-May-2025 |
