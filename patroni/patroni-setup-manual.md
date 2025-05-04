@@ -729,7 +729,7 @@ dnf -y install haproxy
   ```
   Then display the following status page
 
-  <img title="etcd endpoint status" alt="Alt text" src="patroni-images/patroni_switchover.jpg">
+  <img title="etcd endpoint status" alt="Alt text" src="haproxy-images/haproxy_status.jpg">
 
 
 
