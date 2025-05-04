@@ -39,7 +39,7 @@ Patroni is a cluster manager that can customize and automate the deployment and 
 |-------------- | ------|-------- |-----------|
 | ETCD |	3.5 |2379, 2380 |	2379 = Etcd client communication </br> 2380 = Etcd peer-to-peer communication (cluster members)  |
 | Patroni REST API | 4.0 |	8008 |	REST API used by Patroni for health checks, failover, etc. |
-| PostgreSQL | 17.0 |	5432 |	Main PostgreSQL database port |
+| PostgreSQL | 17.4 |	5432 |	Main PostgreSQL database port |
 | HAProxy	| 2.4 |5000, 5001 |	5000 = Client connection for read/write </br> 5001 = Client connection for read-only |
 
 ## 3.	Installation
