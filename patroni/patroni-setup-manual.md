@@ -601,6 +601,136 @@ patronictl [ { -c | --config-file } CONFIG_FILE ] [ { -d | --dcs-url | --dcs } D
 ```
 patronictl -c /etc/patroni/patroni.yml version pg-ha-cluster
 ```
+<img title="etcd endpoint status" alt="Alt text" src="patroni-images/patroni_version.jpg">
+
+- patronictl edit-config changes the dynamic configuration of the cluster and updates the DCS.
+  ```
+  patronictl -c /etc/patroni/patroni.yml edit-config pg-ha-cluster --pg max_connections="150" --force
+  ```
+  <img title="etcd endpoint status" alt="Alt text" src="patroni-images/patroni_edit_config.jpg">
+
+ - patronictl list find the cluster member status.
+   ```
+   patronictl -c /etc/patroni/patroni.yml list pg-ha-cluster
+   ```
+   <img title="etcd endpoint status" alt="Alt text" src="patroni-images/patroni_list.jpg">
+   
+- patronictl restart the patroni cluster.
+  ```
+  patronictl -c /etc/patroni/patroni.yml restart pg-ha-cluster –force
+  ```
+- patronictl failover performs a manual failover in the cluster.
+ ```
+patronictl -c /etc/patroni/patroni.yml failover pg-ha-cluster --candidate node3  --force
+```
+  <img title="etcd endpoint status" alt="Alt text" src="patroni-images/patroni_failover.jpg">
+
+- patronictl switchover performs a manual switch-over in the cluster.
+
+  ```
+  patronictl -c /etc/patroni/patroni.yml switchover pg-ha-cluster --leader node3 --candidate node1
+  ```
+  <img title="etcd endpoint status" alt="Alt text" src="patroni-images/patroni_switchover.jpg">
+
+- patronictl query executes a SQL command or script against a member of the Patroni cluster.
+
+  ```
+  patronictl -c /etc/patroni/patroni.yml query pg-ha-cluster -U postgres --password -c "SELECT now()"
+  ```
+  
+## 5.	HaProxy Setup
+
+- #### Install following packages on haproxy server.
+```
+dnf install epel-release
+dnf -y install haproxy
+```
+
+- ### 	Configure the haproxy.
+  ```
+  vi /etc/haproxy/haproxy.cfg
+  ```
+
+  ```
+  global
+        log         127.0.0.1 local2
+        chroot      /var/lib/haproxy
+        pidfile     /var/run/haproxy.pid
+        maxconn     100
+        user        haproxy
+        group       haproxy
+        daemon
+
+        # turn on stats unix socket
+        stats socket /var/lib/haproxy/stats
+
+        # utilize system-wide crypto-policies
+        ssl-default-bind-ciphers PROFILE=SYSTEM
+        ssl-default-server-ciphers PROFILE=SYSTEM
+
+
+  defaults
+          mode tcp
+          log global
+          option tcplog
+          retries 3
+          timeout queue 1m
+          timeout connect 4s
+          timeout client 60m
+          timeout server 60m
+          timeout check 5s
+          maxconn 100
+  
+  listen stats
+          bind *:7000
+          mode http
+          stats enable
+          stats uri /haproxy?stats
+          stats realm HAProxy\ Statistics
+          stats auth admin:admin123
+          stats refresh 10s
+  
+  # write backend
+  listen primary
+          bind *:5000
+          option httpchk OPTIONS /master
+          http-check expect status 200
+          default-server inter 3s fall 3 rise 2 on-marked-down shutdown-sessions
+          server node1 192.168.17.133:5432 maxconn 100 check port 8008
+          server node2 192.168.17.134:5432 maxconn 100 check port 8008
+          server node3 192.168.17.135:5432 maxconn 100 check port 8008
+  
+  # read backned
+  listen standby
+          bind *:5001
+          balance roundrobin
+          option httpchk OPTIONS /replica
+          http-check expect status 200
+          default-server inter 3s fall 3 rise 2 on-marked-down shutdown-sessions
+          server node1 192.168.17.133:5432 maxconn 100 check port 8008
+          server node2 192.168.17.134:5432 maxconn 100 check port 8008
+          server node3 192.168.17.135:5432 maxconn 100 check port 8008
+  ```
+  
+- Start haproxy service and check the logs.
+  ```
+  systemctl enable haproxy
+  systemctl start haproxy
+  journalctl -xeu haproxy.service
+  systemctl status haproxy
+  ```
+  
+- Check haproxy status URL
+  ```
+  url: http://192.168.17.136:7000/haproxy?stats
+  Will ask username and password
+  Username: admin
+  Password: admin123
+  ```
+  Then display the following status page
+
+  <img title="etcd endpoint status" alt="Alt text" src="patroni-images/patroni_switchover.jpg">
+
 
 
 
