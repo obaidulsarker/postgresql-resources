@@ -588,5 +588,19 @@ tags:
   ```
 <img title="etcd endpoint status" alt="Alt text" src="patroni-images/patroni_list_3.jpg">
 
+## 4.	Patroni CLI Commands
+```
+Patroni has a command-line interface named patronict , which is used basically to interact with Patroni’s REST API and with the DCS (Dynamic Configuration Store).
+patronictl [ { -c | --config-file } CONFIG_FILE ] [ { -d | --dcs-url | --dcs } DCS_URL ] [ { -k | --insecure } ] SUBCOMMAND
+-c / --config-file: provide a path to a configuration file.
+-d / --dcs-url / --dcs: provide a connection string to the DCS.
+-k / --insecure: Flag to bypass validation of REST API server SSL certificate
+```
+
+- patronictl version check version of patroni cluster.
+```
+patronictl -c /etc/patroni/patroni.yml version pg-ha-cluster
+```
+
 
 
