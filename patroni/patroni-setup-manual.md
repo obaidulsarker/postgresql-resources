@@ -231,12 +231,82 @@ ls -la
        ```
        vi /etc/systemd/system/etcd.service
        ```
+    
+       ```
+         [Unit]
+        Description=etcd key-value store
+        Documentation=https://github.com/etcd-io/etcd
+        After=network.target
+        
+        [Service]
+        User=etcd
+        Type=notify
+        Environment=ETCD_DATA_DIR=/var/lib/etcd
+        Environment=ETCD_NAME=node2
+        Environment=ETCD_LISTEN_PEER_URLS="http://192.168.17.134:2380"
+        Environment=ETCD_LISTEN_CLIENT_URLS="http://192.168.17.134:2379,http://127.0.0.1:2379"
+        Environment=ETCD_INITIAL_ADVERTISE_PEER_URLS="http://192.168.17.134:2380"
+        Environment=ETCD_INITIAL_CLUSTER="node1=http://192.168.17.133:2380,node2=http://192.168.17.134:2380,node3=http://192.168.17.135:2380"
+        Environment=ETCD_ADVERTISE_CLIENT_URLS="http://192.168.17.134:2379"
+        Environment=ETCD_INITIAL_CLUSTER_TOKEN="etcdcluster"
+        Environment=ETCD_INITIAL_CLUSTER_STATE="new"
+        ExecStart=/usr/bin/etcd --enable-v2=true
+        Restart=always
+        RestartSec=10s
+        LimitNOFILE=40000
+        
+        [Install]
+        WantedBy=multi-user.target
+        ```
 
-       
+    - On node3 server,
+      ```
+      vi /etc/systemd/system/etcd.service
+      ```
+
+      ```
+      [Unit]
+      Description=etcd key-value store
+      Documentation=https://github.com/etcd-io/etcd
+      After=network.target
+      
+      [Service]
+      User=etcd
+      Type=notify
+      Environment=ETCD_DATA_DIR=/var/lib/etcd
+      Environment=ETCD_NAME=node3
+      Environment=ETCD_LISTEN_PEER_URLS="http://192.168.17.135:2380"
+      Environment=ETCD_LISTEN_CLIENT_URLS="http://192.168.17.135:2379,http://127.0.0.1:2379"
+      Environment=ETCD_INITIAL_ADVERTISE_PEER_URLS="http://192.168.17.135:2380"
+      Environment=ETCD_INITIAL_CLUSTER="node1=http://192.168.17.133:2380,node2=http://192.168.17.134:2380,node3=http://192.168.17.135:2380"
+      Environment=ETCD_ADVERTISE_CLIENT_URLS="http://192.168.17.135:2379"
+      Environment=ETCD_INITIAL_CLUSTER_TOKEN="etcdcluster"
+      Environment=ETCD_INITIAL_CLUSTER_STATE="new"
+      ExecStart=/usr/bin/etcd --enable-v2=true
+      Restart=always
+      RestartSec=10s
+      LimitNOFILE=40000
+
+      [Install]
+      WantedBy=multi-user.target
+      ```
+    
   
-  
-  
-  
+    - Reload the demon on all ETCD nodes and start the etcd service.
+
+    ```
+    systemctl daemon-reload
+    systemctl enable etcd
+    systemctl start etcd
+    systemctl status etcd
+    ```
+
+  - Check ETCD status using etcdctl on any of the etcd node.
+ 
+    ```
+    etcdctl endpoint status --write-out=table --endpoints=$ENDPOINTS
+    ```
+    
   
 
   
