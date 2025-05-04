@@ -1,7 +1,7 @@
 # PostgreSQL HA Cluster Setup Using Patroni
 
-| Author:   | MD OBAIDUL HAQUE SARKER |    
-| -----------|-------------------------|
+|Author: | MD OBAIDUL HAQUE SARKER |    
+|:-----------|:-------------------------|
 | Email:    | aupo37@gmailcom         |
 | LinkedIn: | https://www.linkedin.com/in/md-obaidul-haque-sarker-5b983b26 |
 | Github: | https://github.com/obaidulsarker |
