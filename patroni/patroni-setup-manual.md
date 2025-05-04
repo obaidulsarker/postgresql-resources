@@ -301,17 +301,129 @@ ls -la
     systemctl status etcd
     ```
 
-  - Check ETCD status using etcdctl on any of the etcd node.
+  - Check ETCD endpoint status using etcdctl on any of the etcd node.
  
     ```
     etcdctl endpoint status --write-out=table --endpoints=$ENDPOINTS
     ```
-    
+    <img title="etcd endpoint status" alt="Alt text" src="etcd-images/etcd_endpoint_status.jpg">
+
+  - Check ETCD endpoint health status using etcdctl on any of the etcd node.
+    ```
+    etcdctl endpoint health --endpoints=$ENDPOINTS --write-out=table
+    ```
+    <img title="etcd endpoint health status" alt="Alt text" src="etcd-images/etcd_endpoint_health.jpg">
   
+### 3.3 Install and configure the Patroni cluster
 
+- #### Set up Patroni on all three nodes (node1, node2 and node3) and proceed with the following steps.
+```
+dnf install epel-release
+sudo yum install python3-pip python3-devel binutils
+pip3 install click
+dnf install patroni
+dnf install python-etcd
+systemctl enable patroni
+
+```
+- #### Create a configuration file and the necessary directories for Patroni on node1, node2 and node3 servers.
+  ```
+  mkdir -p /etc/patroni/logs #directory to store logs
+  chmod 777 -R /etc/patroni/logs
+  touch /etc/patroni/patroni.yml
+  chown -R postgres:postgres /etc/patroni
+
+  ```
+- #### Create following directories for PostgreSQL data, log and archive log directories on node1, node2 and node3 servers.
+
+  ```
+  mkdir -p /data/pgsql
+  mkdir -p /log/archive
+  mkdir -p /log/pg_log
+  chmod 700 -R /data/pgsql
+  chmod 700 -R /log/archive
+  chmod 700 -R /log/pg_log
+  chown postgres:postgres -R /data/pgsql /log/archive /log/pg_log
+  ```
+- #### On Node1 patroni.yml, configure the patroni.
+  ```
+  vi /etc/patroni/patroni.yml
+  ```
+
+  ```
+  scope: pg-ha-cluster
+  namespace: '/service'
+  name: node1
   
-    
+  log:
+      traceback_level: INFO
+      level: INFO
+      dir: /etc/patroni/logs/
+      file_num: 5
+  
+  restapi:
+      listen: 0.0.0.0:8008
+      connect_address: 192.168.17.133:8008
+  etcd3:
+      protocol: http
+      hosts: 192.168.17.133:2379,192.168.17.134:2379,192.168.17.135:2379
+  
+  bootstrap:
+      dcs:
+          ttl: 30
+          loop_wait: 10
+          retry_timeout: 10
+          maximum_lag_on_failover: 1048576
+          postgresql:
+              use_pg_rewind: true
+              use_slots: true
+              parameters:
+                  wal_keep_segments: 100
+                  hot_standby: 'on'
+                  max_wal_senders: 10
+                  max_replication_slots: 10
+                  max_wal_size: '1GB'
+                  archive_mode: 'on'
+                  archive_timeout: 600s
+                  archive_command: 'cp -f %p /log/archive/%f'
+                  synchronous_commit: 'on'
+                  synchronous_standby_names: 'ANY 1 (node1, node2, node3)'
+      initdb:
+          - encoding: UTF8
+          - data-checksums
+      pg_hba:
+          - host replication replicator 192.168.17.133/32 md5
+          - host replication replicator 192.168.17.134/32 md5
+          - host replication replicator 192.168.17.135/32 md5
+          - host all all 0.0.0.0/0 md5
+  
+  postgresql:
+      listen: 192.168.17.133:5432
+      connect_address: 192.168.17.133:5432
+      data_dir: /data/pgsql
+      bin_dir: /usr/pgsql-17/bin
+      authentication:
+          replication:
+              username: replicator
+              password: replicator
+          superuser:
+              username: postgres
+              password: postgres
+  tags:
+      nofailover: false
+      noloadbalance: false
+      clonefrom: false
+      nosync: false
 
+```
+- Start patroni service and check member of cluster on node1.
 
+  ```
+    systemctl start patroni
+    systemctl status patroni
+    patronictl -c /etc/patroni/patroni.yml list pg-ha-cluster
+  ```
+  <img title="etcd endpoint status" alt="Alt text" src="etcd-images/etcd_endpoint_status.jpg">
+  
 
 
