@@ -149,6 +149,91 @@ ls -la
   ENDPOINTS=$NODE1:2379,$NODE2:2379,$NODE3:2379
   PATRONI_CONFIG_LOCATION=/etc/patroni/patroni.yml
   ```
+- Activate environment variables.
+
+  ```
+  source .bash_profile
+  ```
+- Add environment variables on node2 server.
+  ```
+  vi .bash_profile
+  ```
+  
+  ```
+  ETCDCTL_API=3
+  NODE1=192.168.17.133
+  NODE2=192.168.17.134
+  NODE3=192.168.17.135
+  
+  ENDPOINTS=$NODE1:2379,$NODE2:2379,$NODE3:2379
+  
+  PATRONI_CONFIG_LOCATION=/etc/patroni/patroni.yml
+  ```
+
+  - Activate environment variables.
+    ```
+    source .bash_profile
+    ```
+
+- Add environment variables on node3 server.
+  ```
+  vi .bash_profile
+  ```
+
+  ```
+  ETCDCTL_API=3
+  NODE1=192.168.17.133
+  NODE2=192.168.17.134
+  NODE3=192.168.17.135
+  ENDPOINTS=$NODE1:2379,$NODE2:2379,$NODE3:2379
+  PATRONI_CONFIG_LOCATION=/etc/patroni/patroni.yml
+  ```
+
+  - Activate environment variables.
+    ```
+    source .bash_profile
+    ```
+- Create the ETCD systemd service on node1, node2 and node3 servers. </br>
+  - On node1 server,
+
+    ```
+    vi /etc/systemd/system/etcd.service
+    ``` 
+
+    ```
+    [Unit]
+    Description=etcd key-value store
+    Documentation=https://github.com/etcd-io/etcd
+    After=network.target
+    
+    [Service]
+    User=etcd
+    Type=notify
+    Environment=ETCD_DATA_DIR=/var/lib/etcd
+    Environment=ETCD_NAME=node1
+    Environment=ETCD_LISTEN_PEER_URLS="http://192.168.17.133:2380"
+    Environment=ETCD_LISTEN_CLIENT_URLS="http://192.168.17.133:2379,http://127.0.0.1:2379"
+    Environment=ETCD_INITIAL_ADVERTISE_PEER_URLS="http://192.168.17.133:2380"
+    Environment=ETCD_INITIAL_CLUSTER="node1=http://192.168.17.133:2380,node2=http://192.168.17.134:2380,node3=http://192.168.17.135:2380"
+    Environment=ETCD_ADVERTISE_CLIENT_URLS="http://192.168.17.133:2379"
+    Environment=ETCD_INITIAL_CLUSTER_TOKEN="etcdcluster"
+    Environment=ETCD_INITIAL_CLUSTER_STATE="new"
+    ExecStart=/usr/bin/etcd --enable-v2=true
+    Restart=always
+    RestartSec=10s
+    LimitNOFILE=40000
+    
+    [Install]
+    WantedBy=multi-user.target
+    ```
+
+     - On node2 server,
+       ```
+       vi /etc/systemd/system/etcd.service
+       ```
+
+       
+  
   
   
   
