@@ -727,9 +727,35 @@ dnf -y install haproxy
   Username: admin
   Password: admin123
   ```
-  Then display the following status page
+  Then display the following status page:
 
   <img title="etcd endpoint status" alt="Alt text" src="haproxy-images/haproxy_status.jpg">
+
+We will connect to primary backend for write operation and connection to standby backend for read operation from client application.</br>
+- Write endpoint:
+  ```
+  psql -h 192.168.17.136 -p 5000 -d postgres -U postgres –password
+  ```
+- Read endpoint:
+ ```
+ psql -h 192.168.17.136 -p 5001 -d postgres -U postgres –password
+ ```
+
+## 6.	Test the Patroni
+
+#### We will test the patroni cluster with write and read operation using the load balancer (haproxy).
+- Write operation:
+  ```
+  psql -h 192.168.17.136 -p 5000 -d postgres -U postgres –password
+  ```
+  
+- Read operation:
+  ```
+  psql -h 192.168.17.136 -p 5001 -d postgres -U postgres –password
+  ```
+
+## 7.	Conclusion
+Patroni simplifies the deployment and management of highly available PostgreSQL clusters. Its ability to automate key tasks such as failover and leader election ensures that database operations can continue with minimal interruption. A well-configured Patroni cluster provides a robust foundation for critical applications requiring continuous database availability.
 
 
 
