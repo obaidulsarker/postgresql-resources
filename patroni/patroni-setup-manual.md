@@ -415,7 +415,7 @@ systemctl enable patroni
       clonefrom: false
       nosync: false
 
-```
+  ```
 - Start patroni service and check member of cluster on node1.
 
   ```
@@ -423,7 +423,8 @@ systemctl enable patroni
     systemctl status patroni
     patronictl -c /etc/patroni/patroni.yml list pg-ha-cluster
   ```
-  <img title="etcd endpoint status" alt="Alt text" src="etcd-images/etcd_endpoint_status.jpg">
+
+<img title="etcd endpoint status" alt="Alt text" src="patroni-images/patroni_list.jpg">
   
 
 
