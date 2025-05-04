@@ -13,3 +13,4 @@ Patroni is a cluster manager that can customize and automate the deployment and 
 
 ## 2. Deployment Architecture
 
+
