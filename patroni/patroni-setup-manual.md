@@ -748,11 +748,17 @@ We will connect to primary backend for write operation and connection to standby
   ```
   psql -h 192.168.17.136 -p 5000 -d postgres -U postgres –password
   ```
+  <img title="etcd endpoint status" alt="Alt text" src="haproxy-images/haproxy_write_connection.jpg"> </br>
+  <img title="etcd endpoint status" alt="Alt text" src="haproxy-images/haproxy_write_createdb.jpg"> </br>
+  <img title="etcd endpoint status" alt="Alt text" src="haproxy-images/haproxy_write_insert.jpg"> </br>
   
 - Read operation:
   ```
   psql -h 192.168.17.136 -p 5001 -d postgres -U postgres –password
   ```
+  <img title="etcd endpoint status" alt="Alt text" src="haproxy-images/haproxy_read_connection.jpg">
+  </br>
+  <img title="etcd endpoint status" alt="Alt text" src="haproxy-images/haproxy_read_select.jpg">
 
 ## 7.	Conclusion
 Patroni simplifies the deployment and management of highly available PostgreSQL clusters. Its ability to automate key tasks such as failover and leader election ensures that database operations can continue with minimal interruption. A well-configured Patroni cluster provides a robust foundation for critical applications requiring continuous database availability.
