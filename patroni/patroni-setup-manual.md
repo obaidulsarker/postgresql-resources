@@ -227,7 +227,7 @@ ls -la
     WantedBy=multi-user.target
     ```
 
-     - On node2 server,
+  - On node2 server,
        ```
        vi /etc/systemd/system/etcd.service
        ```
@@ -257,9 +257,9 @@ ls -la
         
         [Install]
         WantedBy=multi-user.target
-        ```
+       ```
 
-    - On node3 server,
+  - On node3 server,
       ```
       vi /etc/systemd/system/etcd.service
       ```
@@ -292,7 +292,7 @@ ls -la
       ```
     
   
-    - Reload the demon on all ETCD nodes and start the etcd service.
+  - Reload the demon on all ETCD nodes and start the etcd service.
 
     ```
     systemctl daemon-reload
