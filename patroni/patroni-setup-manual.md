@@ -424,7 +424,166 @@ systemctl enable patroni
     patronictl -c /etc/patroni/patroni.yml list pg-ha-cluster
   ```
 
-<img title="etcd endpoint status" alt="Alt text" src="patroni-images/patroni_list.jpg">
+<img title="etcd endpoint status" alt="Alt text" src="patroni-images/patroni_list_1.jpg">
+
+- #### On Node2 patroni.yml, configure the patroni.
+  ```
+  vi /etc/patroni/patroni.yml
+  ```
+  ```
+  scope: pg-ha-cluster
+  namespace: '/service'
+  name: node2
   
+  log:
+      traceback_level: INFO
+      level: INFO
+      dir: /etc/patroni/logs/
+      file_num: 5
+  
+  restapi:
+      listen: 0.0.0.0:8008
+      connect_address: 192.168.17.134:8008
+  etcd3:
+      protocol: http
+      hosts: 192.168.17.133:2379,192.168.17.134:2379,192.168.17.135:2379
+  
+  bootstrap:
+      dcs:
+          ttl: 30
+          loop_wait: 10
+          retry_timeout: 10
+          maximum_lag_on_failover: 1048576
+          postgresql:
+              use_pg_rewind: true
+              use_slots: true
+              parameters:
+                  wal_keep_segments: 100
+                  hot_standby: 'on'
+                  max_wal_senders: 10
+                  max_replication_slots: 10
+                  max_wal_size: '1GB'
+                  archive_mode: 'on'
+                  archive_timeout: 600s
+                  archive_command: 'cp -f %p /log/archive/%f'
+                  synchronous_commit: 'on'
+                  synchronous_standby_names: 'ANY 1 (node1, node2, node3)'
+      initdb:
+          - encoding: UTF8
+          - data-checksums
+      pg_hba:
+          - host replication replicator 192.168.17.133/32 md5
+          - host replication replicator 192.168.17.134/32 md5
+          - host replication replicator 192.168.17.135/32 md5
+          - host all all 0.0.0.0/0 md5
+  
+  postgresql:
+      listen: 192.168.17.134:5432
+      connect_address: 192.168.17.134:5432
+      data_dir: /data/pgsql
+      bin_dir: /usr/pgsql-17/bin
+      authentication:
+          replication:
+              username: replicator
+              password: replicator
+          superuser:
+              username: postgres
+              password: postgres
+  tags:
+      nofailover: false
+      noloadbalance: false
+      clonefrom: false
+      nosync: false
+  ```
+
+- Start the patroni service and check member list of the cluster.
+
+```
+systemctl start patroni
+systemctl status patroni
+patronictl -c /etc/patroni/patroni.yml list pg-ha-cluster
+```
+
+<img title="etcd endpoint status" alt="Alt text" src="patroni-images/patroni_list_2.jpg">
+
+- #### On Node3 patroni.yml, configure the patroni.
+```
+vi /etc/patroni/patroni.yml
+```
+
+```
+scope: pg-ha-cluster
+namespace: '/service'
+name: node3
+
+log:
+    traceback_level: INFO
+    level: INFO
+    dir: /etc/patroni/logs/
+    file_num: 5
+
+restapi:
+    listen: 0.0.0.0:8008
+    connect_address: 192.168.17.135:8008
+etcd3:
+    protocol: http
+    hosts: 192.168.17.133:2379,192.168.17.134:2379,192.168.17.135:2379
+
+bootstrap:
+    dcs:
+        ttl: 30
+        loop_wait: 10
+        retry_timeout: 10
+        maximum_lag_on_failover: 1048576
+        postgresql:
+            use_pg_rewind: true
+            use_slots: true
+            parameters:
+                wal_keep_segments: 100
+                hot_standby: 'on'
+                max_wal_senders: 10
+                max_replication_slots: 10
+                max_wal_size: '1GB'
+                archive_mode: 'on'
+                archive_timeout: 600s
+                archive_command: 'cp -f %p /log/archive/%f'
+                synchronous_commit: 'on'
+                synchronous_standby_names: 'ANY 1 (node1, node2, node3)'
+    initdb:
+        - encoding: UTF8
+        - data-checksums
+    pg_hba:
+        - host replication replicator 192.168.17.133/32 md5
+        - host replication replicator 192.168.17.134/32 md5
+        - host replication replicator 192.168.17.135/32 md5
+        - host all all 0.0.0.0/0 md5
+
+postgresql:
+    listen: 192.168.17.135:5432
+    connect_address: 192.168.17.135:5432
+    data_dir: /data/pgsql
+    bin_dir: /usr/pgsql-17/bin
+    authentication:
+        replication:
+            username: replicator
+            password: replicator
+        superuser:
+            username: postgres
+            password: postgres
+tags:
+    nofailover: false
+    noloadbalance: false
+    clonefrom: false
+    nosync: false
+```
+- Start the patroni service and check the member list on node3 server.
+
+  ```
+  systemctl start patroni
+  systemctl status patroni
+  patronictl -c /etc/patroni/patroni.yml list pg-ha-cluster
+  ```
+<img title="etcd endpoint status" alt="Alt text" src="patroni-images/patroni_list_3.jpg">
+
 
 
