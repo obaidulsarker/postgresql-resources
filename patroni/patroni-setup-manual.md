@@ -19,6 +19,8 @@ Patroni is a cluster manager that can customize and automate the deployment and 
 <img title="Patroni Architecture Diagram" alt="Alt text" src="Patroni_Architecture_Diagram.jpg">
 <center>Figure: Deployment diagram of Patroni cluster</center>
 </br> </br>
+- <strong>Patroni’s architecture</strong> consists of multiple PostgreSQL nodes that handle tasks such as load balancing, automatic failover, and replication. A typical Patroni architecture includes the following components:</br> </br>
+<strong>PostgreSQL</strong> are database nodes.</br> </br>
 <strong> ETCD </strong> is a strongly consistent, distributed key-value store that provides a reliable way to store data that a distributed system or cluster of machines needs to access. Use Etcd to store the state of the PostgreSQL cluster to keep the Postgres cluster up and running.
 </br> </br>
 <strong> HAProxy </strong> or a load balancer offers load balancing and proxying for TCP and HTTP-based applications.
@@ -646,12 +648,12 @@ dnf install epel-release
 dnf -y install haproxy
 ```
 
-- ### Identify Primary and Standby endpoints through Patroni REST API
-  - <strong>GET /master:</strong> primary health check endpoint. It returns HTTP status code 200 only when the Patroni node is in the state running, the role is primary with leader lock.
+- #### Identify Primary and Standby endpoints through Patroni REST API
+  - <strong>GET /master:</strong> primary health check endpoint. It returns HTTP status code 200 only when the Patroni node is in the state running and the role is primary with leader lock.
     
   - <strong>GET /replica:</strong> replica health check endpoint. It returns HTTP status code 200 only when the Patroni node is in the state running, the role is replica and noloadbalance tag is not set.
 
-- ### Configure the haproxy.
+- #### Configure the haproxy.
 
   ```
   vi /etc/haproxy/haproxy.cfg
