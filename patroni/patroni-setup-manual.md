@@ -36,7 +36,7 @@ Patroni is a cluster manager that can customize and automate the deployment and 
 | haproxy |	192.168.17.136 |	AlmaLinux 9.5 |	Database load balancing | 
 | pgbackrest |	192.168.17.137 |	AlmaLinux 9.5 |	Backup and recovery tool |
 
-### Port Information
+### Service Information
 | Service Name | version |	Port |	Purpose |
 |-------------- | ------|-------- |-----------|
 | ETCD |	3.5 |2379, 2380 |	2379 = Etcd client communication </br> 2380 = Etcd peer-to-peer communication (cluster members)  |
