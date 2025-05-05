@@ -93,7 +93,7 @@ vi /etc/hosts
   sudo dnf install -y postgresql17-server postgresql17-contrib
   ```
 
-### Activate SSH trust among nodes using postgres user.
+### 3.2 Activate SSH trust among nodes using postgres user.
 - For example, SSH trust from node1 to node2, node3 and pgbackrest servers.
   - Set postgres user ssh password.
     ```
@@ -114,7 +114,7 @@ vi /etc/hosts
   ```
    *** Repeat above step for other servers.
 
-### Install and Configure the ETCD cluster
+### 3.3 Install and Configure the ETCD cluster
 #### Setup ETCD on node1, node2 and node3 nodes and follow the steps outlined below.
 ```
 wget https://github.com/etcd-io/etcd/releases/download/v3.5.0/etcd-v3.5.0-linux-amd64.tar.gz
@@ -322,7 +322,7 @@ ls -la
     ```
     <img title="etcd endpoint health status" alt="Alt text" src="etcd-images/etcd_endpoint_health.jpg">
   
-### 3.3 Install and configure the Patroni cluster
+### 3.4 Install and configure the Patroni cluster
 
 - #### Set up Patroni on all three nodes (node1, node2 and node3) and proceed with the following steps.
 ```
