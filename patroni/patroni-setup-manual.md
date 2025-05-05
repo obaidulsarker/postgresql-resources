@@ -21,9 +21,12 @@ Patroni is a cluster manager that can customize and automate the deployment and 
 </br> </br>
 - <strong>Patroni’s architecture</strong> consists of multiple PostgreSQL nodes that handle tasks such as load balancing, automatic failover, and replication. A typical Patroni architecture includes the following components:</br> </br>
 <strong>PostgreSQL</strong> are database nodes.</br> </br>
-<strong> ETCD </strong> is a strongly consistent, distributed key-value store that provides a reliable way to store data that a distributed system or cluster of machines needs to access. Use Etcd to store the state of the PostgreSQL cluster to keep the Postgres cluster up and running.
+<strong> Patroni </strong> uses etcd, Consul, or ZooKeeper to maintain a consistent view of the cluster state.  These tools ensure that only one node is elected as the primary, even if there are network partitions. </br> </br>
+<strong> ETCD </strong> is a strongly consistent, distributed key-value store that provides a reliable way to store data that a distributed system or cluster of machines needs to access. It is used for DCS (Distributed Configuration Store). Use Etcd to store the state of the PostgreSQL cluster to keep the Postgres cluster up and running.
 </br> </br>
-<strong> HAProxy </strong> or a load balancer offers load balancing and proxying for TCP and HTTP-based applications.
+<strong>Consul</strong> is a service networking solution that enables teams to manage secure network connectivity between services and across on-prem and multi-cloud environments and runtimes. Consul offers service discovery, service mesh, traffic management, and automated updates to network infrastructure devices. It can be used with Patroni as a DCS for PostgreSQL high availability. Patroni utilizes Consul to manage the cluster configuration, including leader election and failover mechanisms.
+</br> </br>
+<strong> HAProxy </strong> is a load balancer offers load balancing and proxying for TCP and HTTP-based applications.
 </br> </br>
 <strong> PgBackRest </strong> is robust tool used for backup and recovery processes.
 
