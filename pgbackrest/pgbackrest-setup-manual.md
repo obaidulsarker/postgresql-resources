@@ -226,7 +226,8 @@ In a high-availability PostgreSQL environment managed by Patroni, robust backup 
       ```
       sudo -u postgres pgbackrest --stanza=patroni_backup --log-level-console=info check
       ```
-
+      <img title="Check Configuration" alt="Alt text" src="images/backup_check.jpg">
+      
     - Take full backup on pgbackrest server.
      ```
      sudo -u postgres pgbackrest --stanza=patroni_backup --type=full backup
@@ -241,6 +242,8 @@ In a high-availability PostgreSQL environment managed by Patroni, robust backup 
       ```
       sudo -u postgres pgbackrest info
       ```
+
+      <img title="Backup Information" alt="Alt text" src="images/backup_info.jpg">
       
     - Add full and incremental backup schedule in cronjob on pgbackrest server.
       ```
