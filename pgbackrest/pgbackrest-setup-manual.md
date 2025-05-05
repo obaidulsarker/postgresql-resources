@@ -136,7 +136,143 @@ In a high-availability PostgreSQL environment managed by Patroni, robust backup 
       restore_command: "pgbackrest --stanza=patroni_backup archive-get %f \"%p\""
       ```
       Here, stanza name is “patroni_backup”.
+
       <img title="Patroni Configuration" alt="Alt text" src="images/patroni_config.jpg">
 
+    - Alternatively, we can update PostgreSQL parameters using patronictl edit-config command on any of the patroni cluster and restart the patroni cluster.
 
+      ```
+      patronictl -c /etc/patroni/patroni.yml edit-config pg-ha-cluster --pg archive_command="pgbackrest --stanza=patroni_backup archive-push %p" –force
+      patronictl -c /etc/patroni/patroni.yml edit-config pg-ha-cluster --pg restore_command="pgbackrest --stanza=patroni_backup archive-get %f \"%p\"" –force
+      patronictl -c /etc/patroni/patroni.yml edit-config pg-ha-cluster --pg archive_mode="on" –force
+      patronictl -c /etc/patroni/patroni.yml restart pg-ha-cluster –force
+      patronictl -c /etc/patroni/patroni.yml list pg-ha-cluster
+      ```
+
+    - Configure the /etc/pgbackrest/pgbackrest.conf on node1, node2 and node3 servers.
+ 
+      ```
+      vi /etc/pgbackrest/pgbackrest.conf
+      ```
+      ```
+      [patroni_backup]
+      pg1-path=/data/pgsql
+      
+      [global]
+      repo1-path=/data/pgbackrest
+      repo1-host=192.168.17.137
+      repo1-host-user=postgres
+      ```
+    - Configure the /etc/pgbackrest/pgbackrest.conf file on pgbackrest server.
+      ```
+      vi /etc/pgbackrest/pgbackrest.conf
+      ```
+      ```
+      [global]
+      repo1-path=/data/pgbackrest
+      repo1-retention-full=4
+      repo1-retention-full-type=time
+      repo1-host-user=postgres
+      archive-check=n
+      process-max=1
+      log-level-console=info
+      log-path=/var/log/pgbackrest
+      log-level-file=debug
+      start-fast=y
+      delta=y
+      compress-level=3
+      
+      [patroni_backup]
+      pg1-host=node1
+      pg1-host-user=postgres
+      pg1-database=postgres
+      pg1-path=/data/pgsql
+      pg1-port=5432
+      
+      pg2-host=node2
+      pg2-host-user=postgres
+      pg2-database=postgres
+      pg2-path=/data/pgsql
+      pg2-port=5432
+      
+      pg3-host=node3
+      pg3-host-user=postgres
+      pg3-database=postgres
+      pg3-path=/data/pgsql
+      pg3-port=5432
+      ```
+
+    - Restart the patroni service and list the cluster nodes on node1, node2 and node3 servers.
+    ```
+    systemctl restart patroni
+    patronictl -c /etc/patroni/patroni.yml list pg-ha-cluster
+    ```
+
+    - Create stanza on pgbackrest server.
+      ```
+      sudo -u postgres pgbackrest --stanza=patroni_backup --log-level-console=info stanza-create
+      ```
+
+    - Check the configuration and the archiving process on pgbackrest server.
+      ```
+      sudo -u postgres pgbackrest --stanza=patroni_backup --log-level-console=info check
+      ```
+
+    - Take full backup on pgbackrest server.
+     ```
+     sudo -u postgres pgbackrest --stanza=patroni_backup --type=full backup
+     ```
+     
+    - Take incremental backup on pgbackrest server.
+      ```
+      sudo -u postgres pgbackrest --stanza=patroni_backup --type=incr backup
+      ```
+      
+    - Check backup information on pgbackrest server.
+      ```
+      sudo -u postgres pgbackrest info
+      ```
+      
+    - Add full and incremental backup schedule in cronjob on pgbackrest server.
+      ```
+      su – postgres
+      crontab -e
+      ```
+      ```
+      #!/bin/bash
+
+      # Take full backup on every Saturday
+      0 0 * * 0 pgbackrest --stanza=my_cluster_backup --type=full backup >> /data/pgbackrest/full-backups.log
+      
+      # Take incremental backup on every night
+      0 0 * * * pgbackrest --stanza=my_cluster_backup --type=incr backup >> /data/pgbackrest/incremental-backups.log
+      ```
+
+    ## 5.	Recovery Procedure
+      - Identify the latest valid backup: Use the following command to view the available backups and identify the latest full and incremental backups on pgbackrest server.
+        ```
+        pgbackrest --stanza= patroni_backup info
+        ```
+    - Restore the backup: Use the following command to restore the backup to a new directory.
+      ```
+      sudo -u postgres pgbackrest --stanza=patroni_backup restore --target=/path/to/restore/directory
+      ```
+  
+    - Recover to a specific point in time: If necessary, use the --target-time option with the following command to recover to a specific point in time.
+      ```
+      sudo -u postgres pgbackrest --stanza= patroni_backup restore --target=/path/to/restore/directory --target-time="2025-05-04 12:00:00+00"
+      ```
+    - Start the PostgreSQL server: Start the PostgreSQL server using the restored data directory.
+
+    ## 6.	Optimization to Avoid Impacting Primary Node Performance
+    - <strong> Backup from Standby:</strong> Configure pgBackrest to take backups from a standby node. This minimizes the load on the primary node and prevents performance degradation during backups.  The “backup-standby = any” setting in the “/etc/pgbackrest/ pgbackrest.conf” file ensures this.
+    - <strong>Incremental Backups:</strong> Use incremental backups for frequent backups.  Incremental backups only copy the data that has changed since the last backup, which significantly reduces the I/O load.
+    - <strong>Parallel Processing:</strong> Utilize pgBackrest's parallel processing capabilities to speed up the backup process. The process-max setting in the “/etc/pgbackrest/ pgbackrest.conf” file controls the number of parallel processes. Adjust this value based on your server's resources.
+    - <strong>Compression:</strong> Compress the backups to reduce the amount of data that needs to be written to disk.  This can improve backup performance and reduce storage requirements.
+   
+    ## 7.	Conclusion
+    pgBackrest is a crucial component in a Patroni-managed PostgreSQL cluster. It provides the necessary tools to implement a comprehensive backup and recovery strategy. By enabling efficient, reliable, and non-disruptive backups, pgBackrest minimizes the risk of data loss and ensures business continuity. Its integration with Patroni simplifies the management of high-availability PostgreSQL deployments, allowing database administrators to focus on other critical tasks while having confidence in their backup and recovery capabilities.
+
+
+    
 
