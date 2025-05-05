@@ -172,6 +172,8 @@ In a high-availability PostgreSQL environment managed by Patroni, robust backup 
       repo1-host=192.168.17.137
       repo1-host-user=postgres
       ```
+      Here, 192.168.17.137 is the pgbackrest server's IP.
+    
   - Configure the /etc/pgbackrest/pgbackrest.conf file on pgbackrest server.
       ```
       vi /etc/pgbackrest/pgbackrest.conf
