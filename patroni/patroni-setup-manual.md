@@ -771,7 +771,7 @@ We will connect to primary backend for write operation and connection to standby
   <img title="etcd endpoint status" alt="Alt text" src="haproxy-images/haproxy_read_select.jpg">
 
 ## 7.	Setup of PgBackRest:
-- I would recommend to follow the following URL to install and configure the pgbackrest backup and recovery tool which will be integrated with Patroni cluster.</br>
+- I would recommend to follow the following URL to install and configure the pgbackrest tool and it will integrate with Patroni cluster.</br>
 URL: https://github.com/obaidulsarker/postgresql-resources/blob/main/pgbackrest/pgbackrest-setup-manual.md
 
 ## 8.	Conclusion
