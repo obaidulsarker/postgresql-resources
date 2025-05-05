@@ -101,69 +101,69 @@ In a high-availability PostgreSQL environment managed by Patroni, robust backup 
  ### 4.2 Install and Configure the PgBackRest
 
   - Install pgbackrest on all servers [pgbackrest, node1, node2 and node3].
-        ```
-        sudo dnf install -y epel-release
-        sudo dnf install pgbackrest -y
-        ```
+    ```
+    sudo dnf install -y epel-release
+    sudo dnf install pgbackrest -y
+    ```
 - Take backup existing config file [/etc/pgbackrest.conf] if any, on all servers [pgbackrest, node1, node2 and node3].
-        ```
-        mv etc/pgbackrest.conf etc/pgbackrest.conf.bk
-        ```
-  - Create following directories on all patroni nodes [node1, node2 and node3].
-        ```
-        sudo mkdir -p -m 770 /var/log/pgbackrest
-        sudo chown postgres:postgres /var/log/pgbackrest
-        sudo mkdir -p /etc/pgbackrest
-        sudo mkdir -p /etc/pgbackrest/conf.d
-        sudo touch /etc/pgbackrest/pgbackrest.conf
-        sudo chmod 640 /etc/pgbackrest/pgbackrest.conf
-        sudo chown postgres:postgres /etc/pgbackrest/pgbackrest.conf
-        ```
+  ```
+  mv etc/pgbackrest.conf etc/pgbackrest.conf.bk
+  ```
+- Create following directories on all patroni nodes [node1, node2 and node3].
+  ```
+  sudo mkdir -p -m 770 /var/log/pgbackrest
+  sudo chown postgres:postgres /var/log/pgbackrest
+  sudo mkdir -p /etc/pgbackrest
+  sudo mkdir -p /etc/pgbackrest/conf.d
+  sudo touch /etc/pgbackrest/pgbackrest.conf
+  sudo chmod 640 /etc/pgbackrest/pgbackrest.conf
+  sudo chown postgres:postgres /etc/pgbackrest/pgbackrest.conf
+  ```
         
-  - Create following directories on pgabckrest server.
-        ```
-        sudo mkdir -p /data/pgbackrest
-        sudo mkdir -p /var/log/pgbackrest
-        sudo chown postgres:postgres /data/pgbackrest
-        sudo chown postgres:postgres /var/log/pgbackrest
-        sudo chmod 750 /data/pgbackrest
-        sudo mkdir -p /etc/pgbackrest
-        sudo mkdir -p /etc/pgbackrest/conf.d
-        sudo touch /etc/pgbackrest/pgbackrest.conf
-        sudo chmod 640 /etc/pgbackrest/pgbackrest.conf
-        sudo chown postgres:postgres /etc/pgbackrest/pgbackrest.conf
-        ```
-  - Add following PostgreSQL parameters in /etc/patroni/patroni.yml on node1, node2 and node3 servers
-      ```
-      vi /etc/patroni/patroni.yml
-      ```
-      ```
-      archive_command: "pgbackrest --stanza=patroni_backup archive-push %p"
-      archive_mode: "on"
-      wal_level: “replica”
-      max_wal_senders: “10”
-      restore_command: "pgbackrest --stanza=patroni_backup archive-get %f \"%p\""
-      ```
-      Here, stanza name is “patroni_backup”.
+- Create following directories on pgabckrest server.
+  ```
+  sudo mkdir -p /data/pgbackrest
+  sudo mkdir -p /var/log/pgbackrest
+  sudo chown postgres:postgres /data/pgbackrest
+  sudo chown postgres:postgres /var/log/pgbackrest
+  sudo chmod 750 /data/pgbackrest
+  sudo mkdir -p /etc/pgbackrest
+  sudo mkdir -p /etc/pgbackrest/conf.d
+  sudo touch /etc/pgbackrest/pgbackrest.conf
+  sudo chmod 640 /etc/pgbackrest/pgbackrest.conf
+  sudo chown postgres:postgres /etc/pgbackrest/pgbackrest.conf
+  ```
+- Add following PostgreSQL parameters in /etc/patroni/patroni.yml on node1, node2 and node3 servers
+  ```
+  vi /etc/patroni/patroni.yml
+  ```
+  ```
+  archive_command: "pgbackrest --stanza=patroni_backup archive-push %p"
+  archive_mode: "on"
+  wal_level: “replica”
+  max_wal_senders: “10”
+  restore_command: "pgbackrest --stanza=patroni_backup archive-get %f \"%p\""
+  ```
+  Here, stanza name is “patroni_backup”.
 
-    <img title="Patroni Configuration" alt="Alt text" src="images/patroni_config.jpg">
+  <img title="Patroni Configuration" alt="Alt text" src="images/patroni_config.jpg">
 
-  - Alternatively, we can update PostgreSQL parameters using patronictl edit-config command on any of the patroni cluster and restart the patroni cluster.
+- Alternatively, we can update PostgreSQL parameters using patronictl edit-config command on any of the patroni cluster and restart the patroni cluster.
 
-      ```
-      patronictl -c /etc/patroni/patroni.yml edit-config pg-ha-cluster --pg archive_command="pgbackrest --stanza=patroni_backup archive-push %p" –force
-      patronictl -c /etc/patroni/patroni.yml edit-config pg-ha-cluster --pg restore_command="pgbackrest --stanza=patroni_backup archive-get %f \"%p\"" –force
-      patronictl -c /etc/patroni/patroni.yml edit-config pg-ha-cluster --pg archive_mode="on" –force
-      patronictl -c /etc/patroni/patroni.yml restart pg-ha-cluster –force
-      patronictl -c /etc/patroni/patroni.yml list pg-ha-cluster
-      ```
+  ```
+  patronictl -c /etc/patroni/patroni.yml edit-config pg-ha-cluster --pg archive_command="pgbackrest --stanza=patroni_backup archive-push %p" –force
+  patronictl -c /etc/patroni/patroni.yml edit-config pg-ha-cluster --pg restore_command="pgbackrest --stanza=patroni_backup archive-get %f \"%p\"" –force
+  patronictl -c /etc/patroni/patroni.yml edit-config pg-ha-cluster --pg archive_mode="on" –force
+  patronictl -c /etc/patroni/patroni.yml restart pg-ha-cluster –force
+  patronictl -c /etc/patroni/patroni.yml list pg-ha-cluster
+  ```
 
-  - Configure the /etc/pgbackrest/pgbackrest.conf on node1, node2 and node3 servers.
+- Configure the /etc/pgbackrest/pgbackrest.conf on node1, node2 and node3 servers.
  
-      ```
+  ```
       vi /etc/pgbackrest/pgbackrest.conf
-      ```
-      ```
+  ```
+  ```
       [patroni_backup]
       pg1-path=/data/pgsql
       
@@ -171,14 +171,16 @@ In a high-availability PostgreSQL environment managed by Patroni, robust backup 
       repo1-path=/data/pgbackrest
       repo1-host=192.168.17.137
       repo1-host-user=postgres
-      ```
-      Here, 192.168.17.137 is the pgbackrest server's IP.
+  ```
+  Here, "192.168.17.137" is the pgbackrest server's IP. </br>
+  "/data/pgbackrest" is the repository location on pgbackrest server. Postgres user must have write access on repositroy directory.</br>
+  "/data/pgsql" is the data directory of postgresql cluster.</br>
     
-  - Configure the /etc/pgbackrest/pgbackrest.conf file on pgbackrest server.
-      ```
-      vi /etc/pgbackrest/pgbackrest.conf
-      ```
-      ```
+- Configure the /etc/pgbackrest/pgbackrest.conf file on pgbackrest server.
+  ```
+  vi /etc/pgbackrest/pgbackrest.conf
+  ```
+  ```
       [global]
       repo1-path=/data/pgbackrest
       repo1-retention-full=4
@@ -211,24 +213,27 @@ In a high-availability PostgreSQL environment managed by Patroni, robust backup 
       pg3-database=postgres
       pg3-path=/data/pgsql
       pg3-port=5432
-      ```
+  ```
 
-  - Restart the patroni service and list the cluster nodes on node1, node2 and node3 servers.
-    ```
+- Restart the patroni service and list the cluster nodes on node1, node2 and node3 servers.
+
+  ```
     systemctl restart patroni
     patronictl -c /etc/patroni/patroni.yml list pg-ha-cluster
-    ```
+  ```
 
-  - Create stanza on pgbackrest server.
-      ```
-      sudo -u postgres pgbackrest --stanza=patroni_backup --log-level-console=info stanza-create
-      ```
+- Create stanza on pgbackrest server.
 
-  - Check the configuration and the archiving process on pgbackrest server.
-      ```
-      sudo -u postgres pgbackrest --stanza=patroni_backup --log-level-console=info check
-      ```
-      <img title="Check Configuration" alt="Alt text" src="images/backup_check.jpg">
+  ```
+  sudo -u postgres pgbackrest --stanza=patroni_backup --log-level-console=info stanza-create
+  ```
+
+- Check the configuration and the archiving process on pgbackrest server.
+
+  ```
+  sudo -u postgres pgbackrest --stanza=patroni_backup --log-level-console=info check
+  ```
+  <img title="Check Configuration" alt="Alt text" src="images/backup_check.jpg">
 
 ## 5.	Backup Procedure
 
@@ -243,9 +248,10 @@ In a high-availability PostgreSQL environment managed by Patroni, robust backup 
       ```
       
   - Check backup information on pgbackrest server.
-      ```
-      sudo -u postgres pgbackrest info
-      ```
+    
+    ```
+    sudo -u postgres pgbackrest info
+    ```
 
       <img title="Backup Information" alt="Alt text" src="images/backup_info.jpg">
       
@@ -264,24 +270,24 @@ In a high-availability PostgreSQL environment managed by Patroni, robust backup 
       0 0 * * * pgbackrest --stanza=my_cluster_backup --type=incr backup >> /data/pgbackrest/incremental-backups.log
       ```
 
-    ## 6.	Recovery Procedure
-      - Identify the latest valid backup: Use the following command to view the available backups and identify the latest full and incremental backups on pgbackrest server.
-        ```
-        sudo -u postgres pgbackrest --stanza=patroni_backup info
-        ```
-    - Restore the backup: Use the following command to restore the backup to a new directory.
-      ```
-      sudo -u postgres pgbackrest --stanza=patroni_backup restore --target=/path/to/restore/directory
-      ```
-      You need to provide the actual data directory of PostgreSQL instread of "/path/to/restore/directory"
+## 6.	Recovery Procedure
+- Identify the latest valid backup: Use the following command to view the available backups and identify the latest full and incremental backups on pgbackrest server.
+    ```
+    sudo -u postgres pgbackrest --stanza=patroni_backup info
+    ```
+- Restore the backup: Use the following command to restore the backup to a new directory.
+  ```
+  sudo -u postgres pgbackrest --stanza=patroni_backup restore --target=/path/to/restore/directory
+  ```
+  You need to provide the actual data directory of PostgreSQL instread of "/path/to/restore/directory"
       
-    - Recover to a specific point in time: If necessary, use the --target-time option with the following command to recover to a specific point in time.
-      ```
-      sudo -u postgres pgbackrest --stanza= patroni_backup restore --target=/path/to/restore/directory --target-time="2025-05-04 12:00:00+00"
-      ```
-      You need to provide the actual data directory of PostgreSQL instread of "/path/to/restore/directory"
+- Recover to a specific point in time: If necessary, use the --target-time option with the following command to recover to a specific point in time.
+    ```
+    sudo -u postgres pgbackrest --stanza= patroni_backup restore --target=/path/to/restore/directory --target-time="2025-05-04 12:00:00+00"
+    ```
+  You need to provide the actual data directory of PostgreSQL instread of "/path/to/restore/directory"
       
-    - Start the PostgreSQL server: Start the PostgreSQL server using the restored data directory.
+- Start the PostgreSQL server: Start the PostgreSQL server using the restored data directory.
 
     ## 7.	Optimization to Avoid Impacting Primary Node Performance
     - <strong> Backup from Standby:</strong> Configure pgBackrest to take backups from a standby node. This minimizes the load on the primary node and prevents performance degradation during backups.  The “backup-standby = any” setting in the “/etc/pgbackrest/ pgbackrest.conf” file ensures this.
