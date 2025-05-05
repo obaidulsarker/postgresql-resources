@@ -43,7 +43,8 @@ In a high-availability PostgreSQL environment managed by Patroni, robust backup 
 
 ## 4.	Installation and Configuration
 ### 3.1	Pre-requisites
-  - Installed and configured the 3 nodes Patroni cluster.
+  - Installed and configured the 3 nodes Patroni cluster. If it is not installed, please use following URL to install and confgure the patroni cluster:</br>
+    https://github.com/obaidulsarker/postgresql-resources/blob/f8ad19ead6d9a7c278d20026e112d8238cff8241/patroni/patroni-setup-manual.md
   - Patroni cluster must be running.
   - A backup repository location with sufficient storage on dedicated backup server.
   - Network connectivity between Patroni nodes and the backup repository.
@@ -257,11 +258,14 @@ In a high-availability PostgreSQL environment managed by Patroni, robust backup 
       ```
       sudo -u postgres pgbackrest --stanza=patroni_backup restore --target=/path/to/restore/directory
       ```
-  
+      You need to give provide the actual data directory of PostgreSQL instread of "/path/to/restore/directory"
+      
     - Recover to a specific point in time: If necessary, use the --target-time option with the following command to recover to a specific point in time.
       ```
       sudo -u postgres pgbackrest --stanza= patroni_backup restore --target=/path/to/restore/directory --target-time="2025-05-04 12:00:00+00"
       ```
+      You need to give provide the actual data directory of PostgreSQL instread of "/path/to/restore/directory"
+      
     - Start the PostgreSQL server: Start the PostgreSQL server using the restored data directory.
 
     ## 6.	Optimization to Avoid Impacting Primary Node Performance
