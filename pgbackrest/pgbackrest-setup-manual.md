@@ -260,7 +260,7 @@ In a high-availability PostgreSQL environment managed by Patroni, robust backup 
     ## 5.	Recovery Procedure
       - Identify the latest valid backup: Use the following command to view the available backups and identify the latest full and incremental backups on pgbackrest server.
         ```
-        pgbackrest --stanza= patroni_backup info
+        sudo -u postgres pgbackrest --stanza=patroni_backup info
         ```
     - Restore the backup: Use the following command to restore the backup to a new directory.
       ```
