@@ -266,13 +266,13 @@ In a high-availability PostgreSQL environment managed by Patroni, robust backup 
       ```
       sudo -u postgres pgbackrest --stanza=patroni_backup restore --target=/path/to/restore/directory
       ```
-      You need to give provide the actual data directory of PostgreSQL instread of "/path/to/restore/directory"
+      You need to provide the actual data directory of PostgreSQL instread of "/path/to/restore/directory"
       
     - Recover to a specific point in time: If necessary, use the --target-time option with the following command to recover to a specific point in time.
       ```
       sudo -u postgres pgbackrest --stanza= patroni_backup restore --target=/path/to/restore/directory --target-time="2025-05-04 12:00:00+00"
       ```
-      You need to give provide the actual data directory of PostgreSQL instread of "/path/to/restore/directory"
+      You need to provide the actual data directory of PostgreSQL instread of "/path/to/restore/directory"
       
     - Start the PostgreSQL server: Start the PostgreSQL server using the restored data directory.
 
