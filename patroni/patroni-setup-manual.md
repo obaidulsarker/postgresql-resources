@@ -767,7 +767,11 @@ We will connect to primary backend for write operation and connection to standby
   </br>
   <img title="etcd endpoint status" alt="Alt text" src="haproxy-images/haproxy_read_select.jpg">
 
-## 7.	Conclusion
+## 7.	Setup of PgBackRest:
+- I would recommend to follow the following URL to install and configure the pgbackrest backup and recovery tool which will be integrated with Patroni cluster.</br>
+URL: https://github.com/obaidulsarker/postgresql-resources/blob/main/pgbackrest/pgbackrest-setup-manual.md
+
+## 8.	Conclusion
 Patroni simplifies the deployment and management of highly available PostgreSQL clusters. Its ability to automate key tasks such as failover and leader election ensures that database operations can continue with minimal interruption. A well-configured Patroni cluster provides a robust foundation for critical applications requiring continuous database availability.
 
 
