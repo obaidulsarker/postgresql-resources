@@ -30,6 +30,14 @@ In a high-availability PostgreSQL environment managed by Patroni, robust backup 
 | node3 |	192.168.17.135 |	AlmaLinux 9.5	| PostgreSQL, ETCD, Patroni, pgbackrest |
 | pgbackrest |	192.168.17.137 |	AlmaLinux 9.5 |	pgbackrest |
 
+### Service Information
+| Service Name | version |	Port |	Purpose |
+|-------------- | ------|-------- |-----------|
+| ETCD |	3.5 |2379, 2380 |	2379 = Etcd client communication </br> 2380 = Etcd peer-to-peer communication (cluster members)  |
+| Patroni REST API | 4.0 |	8008 |	REST API used by Patroni for health checks, failover, etc. |
+| PostgreSQL | 17.4 |	5432 |	Main PostgreSQL database port |
+
+
 ## 3.	Backup Strategy
 |Backup Method|	Backup Type|	Frequency| 	Retention Policy|	RTO|	RPO|
 |-------------|-------------|-----------|-------------------|----|----|
