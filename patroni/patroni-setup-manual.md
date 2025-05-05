@@ -646,7 +646,13 @@ dnf install epel-release
 dnf -y install haproxy
 ```
 
+- ### Identify Primary and Standby endpoints through Patroni REST API
+  - <strong>GET /master:</strong> primary health check endpoint. It returns HTTP status code 200 only when the Patroni node is in the state running, the role is primary with leader lock.
+    
+  - <strong>GET /replica:</strong> replica health check endpoint. It returns HTTP status code 200 only when the Patroni node is in the state running, the role is replica and noloadbalance tag is not set.
+
 - ### 	Configure the haproxy.
+
   ```
   vi /etc/haproxy/haproxy.cfg
   ```
