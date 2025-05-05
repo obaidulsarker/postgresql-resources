@@ -651,7 +651,7 @@ dnf -y install haproxy
     
   - <strong>GET /replica:</strong> replica health check endpoint. It returns HTTP status code 200 only when the Patroni node is in the state running, the role is replica and noloadbalance tag is not set.
 
-- ### 	Configure the haproxy.
+- ### Configure the haproxy.
 
   ```
   vi /etc/haproxy/haproxy.cfg
@@ -755,7 +755,6 @@ We will connect to primary backend for write operation and connection to standby
   psql -h 192.168.17.136 -p 5000 -d postgres -U postgres –password
   ```
   <img title="etcd endpoint status" alt="Alt text" src="haproxy-images/haproxy_write_connection.jpg"> </br>
-  <img title="etcd endpoint status" alt="Alt text" src="haproxy-images/haproxy_write_createdb.jpg"> </br>
   <img title="etcd endpoint status" alt="Alt text" src="haproxy-images/haproxy_write_insert.jpg"> </br>
   
 - Read operation:
