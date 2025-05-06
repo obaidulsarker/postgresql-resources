@@ -290,7 +290,7 @@ In a high-availability PostgreSQL environment managed by Patroni, robust backup 
 - Start the PostgreSQL server: Start the PostgreSQL server using the restored data directory.
 
     ## 7.	Optimization to Avoid Impacting Primary Node Performance
-    - <strong> Backup from Standby:</strong> Configure pgBackrest to take backups from a standby node. This minimizes the load on the primary node and prevents performance degradation during backups.  The “backup-standby = any” setting in the “/etc/pgbackrest/ pgbackrest.conf” file ensures this.
+    - <strong> Backup from Standby:</strong> Configure pgBackrest to take backups from a standby node. This minimizes the load on the primary node and prevents performance degradation during backups.  The “backup-standby=y” or “backup-standby=prefer” setting in the “/etc/pgbackrest/pgbackrest.conf” file ensures this.
     - <strong>Incremental Backups:</strong> Use incremental backups for frequent backups.  Incremental backups only copy the data that has changed since the last backup, which significantly reduces the I/O load.
     - <strong>Parallel Processing:</strong> Utilize pgBackrest's parallel processing capabilities to speed up the backup process. The process-max setting in the “/etc/pgbackrest/ pgbackrest.conf” file controls the number of parallel processes. Adjust this value based on your server's resources.
     - <strong>Compression:</strong> Compress the backups to reduce the amount of data that needs to be written to disk.  This can improve backup performance and reduce storage requirements.
