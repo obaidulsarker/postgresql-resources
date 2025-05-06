@@ -742,7 +742,7 @@ dnf -y install haproxy
 
   <img title="etcd endpoint status" alt="Alt text" src="haproxy-images/haproxy_status.jpg">
 
-We will connect to primary backend for write operation and connection to standby backend for read operation from client application.</br>
+We will connect to primary backend for write operation and connect to standby backend for read operation from client application.</br>
 - Write endpoint:
   ```
   psql -h 192.168.17.136 -p 5000 -d postgres -U postgres –password
