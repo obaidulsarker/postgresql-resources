@@ -41,12 +41,14 @@ In a high-availability PostgreSQL environment managed by Patroni, robust backup 
 ## 3.	Backup Strategy
 |Backup Method|	Backup Type|	Frequency| 	Retention Policy|	RTO|	RPO|
 |-------------|-------------|-----------|-------------------|----|----|
-|pgBackrest| 	Full	|Weekly|	4 backups|	30 minutes|	10 minutes|
-|pgBackrest| 	Incremental|	Daily|	28 days|	30 minutes|	10 minutes|
-|pgBackrest| 	WAL archive|	Continuous|	28 days|	30 minutes|	10 minutes|
+|pgBackrest| 	Full	|Weekly|	4 backups|	10 minutes|	5 minutes|
+|pgBackrest| 	Incremental|	Daily|	28 days|	10 minutes|	5 minutes|
+|pgBackrest| 	WAL archive|	Continuous|	28 days|	10 minutes|	5 minutes|
 
-  - RTO (Recovery Time Objective)
-  - RPO (Recovery Point Objective)</br>
+  - RTO (Recovery Time Objective): This is the maximum acceptable time a database
+system can be down after an outage. 
+  - RPO (Recovery Point Objective): This defines the maximum acceptable amount of
+data loss after a database system outage.</br>
   *** Assume that database size less is than 10GB.
 
 ## 4.	Installation and Configuration
@@ -107,7 +109,7 @@ In a high-availability PostgreSQL environment managed by Patroni, robust backup 
     ```
 - Take backup existing config file [/etc/pgbackrest.conf] if any, on all servers [pgbackrest, node1, node2 and node3].
   ```
-  mv etc/pgbackrest.conf etc/pgbackrest.conf.bk
+  mv /etc/pgbackrest.conf /etc/pgbackrest.conf.bk
   ```
 - Create following directories on all patroni nodes [node1, node2 and node3].
   ```
@@ -133,7 +135,7 @@ In a high-availability PostgreSQL environment managed by Patroni, robust backup 
   sudo chmod 640 /etc/pgbackrest/pgbackrest.conf
   sudo chown postgres:postgres /etc/pgbackrest/pgbackrest.conf
   ```
-- Add following PostgreSQL parameters in /etc/patroni/patroni.yml on node1, node2 and node3 servers
+- Add following PostgreSQL parameters in /etc/patroni/patroni.yml file on node1, node2 and node3 servers
   ```
   vi /etc/patroni/patroni.yml
   ```
