@@ -272,7 +272,12 @@ data loss after a database system outage.</br>
       0 0 * * * pgbackrest --stanza=my_cluster_backup --type=incr backup >> /data/pgbackrest/incremental-backups.log
       ```
 
-## 6.	Recovery Procedure
+## 6.	Restore Bakcup:
+- The restore command automatically defaults to selecting the latest backup from the first repository where backups exist.
+- To select from a specific repository, the --repo option can be passed (e.g. --repo=1).
+- The --set option can be passed if a backup other than the latest is desired.
+- When PITR of --type=time or --type=lsn is specified, then the target time or target lsn must be specified with the --target option.
+
 - Identify the latest valid backup: Use the following command to view the available backups and identify the latest full and incremental backups on pgbackrest server.
     ```
     sudo -u postgres pgbackrest --stanza=patroni_backup info
