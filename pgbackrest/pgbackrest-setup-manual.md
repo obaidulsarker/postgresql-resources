@@ -266,10 +266,10 @@ data loss after a database system outage.</br>
       #!/bin/bash
 
       # Take full backup on every Saturday
-      0 0 * * 0 pgbackrest --stanza=my_cluster_backup --type=full backup >> /data/pgbackrest/full-backups.log
+      0 0 * * 0 pgbackrest --stanza=patroni_backup --type=full backup >> /data/pgbackrest/full-backups.log
       
       # Take incremental backup on every night
-      0 0 * * * pgbackrest --stanza=my_cluster_backup --type=incr backup >> /data/pgbackrest/incremental-backups.log
+      0 0 * * * pgbackrest --stanza=patroni_backup --type=incr backup >> /data/pgbackrest/incremental-backups.log
       ```
 
 ## 6.	Restore Bakcup:
@@ -282,9 +282,46 @@ data loss after a database system outage.</br>
     ```
     sudo -u postgres pgbackrest --stanza=patroni_backup info
     ```
-- Restore the backup: Use the following command to restore the backup to a new directory.
+    ```
+    stanza: patroni_backup
+    status: ok
+    cipher: none
+
+    db (current)
+        wal archive min/max (17): 000000160000000000000036/0000001E0000000000000042
+
+        full backup: 20250507-194113F
+            timestamp start/stop: 2025-05-07 19:41:13+06 / 2025-05-07 19:41:16+06
+            wal start/stop: 000000160000000000000036 / 000000160000000000000036
+            database size: 36.9MB, database backup size: 36.9MB
+            repo1: backup set size: 5.3MB, backup size: 5.3MB
+
+        full backup: 20250512-235548F
+            timestamp start/stop: 2025-05-12 23:55:48+06 / 2025-05-12 23:55:52+06
+            wal start/stop: 0000001E0000000000000042 / 0000001E0000000000000042
+            database size: 36.9MB, database backup size: 36.9MB
+            repo1: backup set size: 5.3MB, backup size: 5.3MB
+
+    ```
+- To show detail of a backup (i.e. 20250512-235548F), use following command
   ```
-  sudo -u postgres pgbackrest --stanza=patroni_backup restore --target=/path/to/restore/directory
+  sudo -u postgres pgbackrest --stanza=patroni_backup --set=20250512-235548F info
+  ```
+  ```
+  stanza: patroni_backup
+    status: ok
+    cipher: none
+
+    db (current)
+        wal archive min/max (17): 000000160000000000000036/0000001E0000000000000042
+
+        full backup: 20250512-235548F
+            timestamp start/stop: 2025-05-12 23:55:48+06 / 2025-05-12 23:55:52+06
+            wal start/stop: 0000001E0000000000000042 / 0000001E0000000000000042
+            lsn start/stop: 0/420000D8 / 0/420001D0
+            database size: 36.9MB, database backup size: 36.9MB
+            repo1: backup set size: 5.3MB, backup size: 5.3MB
+            database list: paymentology (16389), postgres (5), test (24599)
   ```
   You need to provide the actual data directory of PostgreSQL instread of "/path/to/restore/directory"
       
