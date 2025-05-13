@@ -344,12 +344,12 @@ data loss after a database system outage.</br>
     ```
     # su - postgres
     # psql
-    # CREATE DATBASE test2;
+    # CREATE DATABASE test2;
     # \l
     # \c test2;
     # CREATE TABLE test(id SERIAL NOT NULL, sname VARCHAR(100));
     # INSERT INTO test(sname) VALUES('Obaidul Haque');
-    # INSERT INTO test(sname) VALUES('Obaidul Haque');
+    # INSERT INTO test(sname) VALUES('Julian');
     # SELECT * FROM test;
     ```
 
