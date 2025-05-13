@@ -323,15 +323,62 @@ data loss after a database system outage.</br>
             repo1: backup set size: 5.3MB, backup size: 5.3MB
             database list: paymentology (16389), postgres (5), test (24599)
   ```
-  You need to provide the actual data directory of PostgreSQL instread of "/path/to/restore/directory"
-      
-- Recover to a specific point in time: If necessary, use the --target-time option with the following command to recover to a specific point in time.
+  - If the database to restore is not known, use the info command set option to discover databases that are part of the backup set.
+  - Stop the cluster and restore only the test database. Built-in databases (template0, template1, and postgres) are always restored.
     ```
-    sudo -u postgres pgbackrest --stanza= patroni_backup restore --target=/path/to/restore/directory --target-time="2025-05-04 12:00:00+00"
+    # sudo systemctl stop patroni
+    # sudo -u postgres pgbackrest --stanza=patroni_backup --delta \
+       --db-include=test --type=immediate --target-action=promote restore
+    # sudo systemctl start patroni
     ```
-  You need to provide the actual data directory of PostgreSQL instread of "/path/to/restore/directory"
-      
-- Start the PostgreSQL server: Start the PostgreSQL server using the restored data directory.
+  #### 6.1 Point-in-Time Recovery(PITR):
+  Point-in-Time Recovery (PITR) allows the WAL to be played from a backup to a specified lsn, time, transaction id, or recovery point.
+
+  - Take a full backup and list all backups info.
+  ```
+  sudo -u postgres pgbackrest --stanza=patroni_backup --type=full backup
+  sudo -u postgres pgbackrest --stanza=patroni_backup info
+  ```
+  
+  - Create an DATABASE on primary server and create a sample TABLE here.
+    ```
+    # su - postgres
+    # psql
+    # CREATE DATBASE test2;
+    # \l
+    # \c test2;
+    # CREATE TABLE test(id SERIAL NOT NULL, sname VARCHAR(100));
+    # INSERT INTO test(sname) VALUES('Obaidul Haque');
+    # INSERT INTO test(sname) VALUES('Obaidul Haque');
+    # SELECT * FROM test;
+    ```
+
+  - Take incremental backup and list backup info.
+    ```
+     sudo -u postgres pgbackrest --stanza=patroni_backup --type=incr backup
+     sudo -u postgres pgbackrest --stanza=patroni_backup info
+    ```
+
+  - Now we will DROP test2 DATABASE.
+    ```
+    # su - postgres
+    # psql
+    # SELECT current_timestamp;
+    # DROP DATABASE test2;
+    # \l
+    ```
+  - Restore the demo cluster to "2025-05-05 15:37:03.157376+00"
+    ```
+    # sudo -u postgres pgbackrest --stanza=patroni_backup --delta \
+       --type=time "--target=2025-05-05 15:37:03.157376+00" \
+       --target-action=promote restore
+    ```
+  - Now check the recovered database (i.e. test2).
+    ```
+    # su - postgres
+    # psql
+    # \l
+    ```
 
 ## 7.	Optimization to Avoid Impacting Primary Node Performance
 - <strong> Backup from Standby:</strong> Configure pgBackrest to take backups from a standby node. This minimizes the load on the primary node and prevents performance degradation during backups.  The “backup-standby=y” or “backup-standby=prefer” setting in the “/etc/pgbackrest/pgbackrest.conf” file ensures this.
