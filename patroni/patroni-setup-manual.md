@@ -650,13 +650,13 @@ patronictl -c /etc/patroni/patroni.yml failover pg-ha-cluster --candidate node3 
   ```
   patronictl -c /etc/patroni/patroni.yml list pg-ha-cluster -e
   ```
-| Member | Host           | Role    | State     | TL | Lag in MB | Pending restart | Pending restart reason | Scheduled restart | Tags |
-|--------|----------------|---------|-----------|----|-----------|-----------------|------------------------|-------------------|------|
-| node1  | 192.168.17.133 | Replica | streaming | 36 |         0 |                 |                        |                   |      |
-| node2  | 192.168.17.134 | Replica | streaming | 36 |         0 |                 |                        |                   |      |
-| node3  | 192.168.17.135 | Leader  | running   | 36 |           |                 |                        |                   |      |
+    | Member | Host           | Role    | State     | TL | Lag in MB | Pending restart | Pending restart reason | Scheduled restart | Tags |
+    |--------|----------------|---------|-----------|----|-----------|-----------------|------------------------|-------------------|------|
+    | node1  | 192.168.17.133 | Replica | streaming | 36 |         0 |                 |                        |                   |      |
+    | node2  | 192.168.17.134 | Replica | streaming | 36 |         0 |                 |                        |                   |      |
+    | node3  | 192.168.17.135 | Leader  | running   | 36 |           |                 |                        |                   |      |
 
-  Rebuild node1 and node2 replica nodes.
+  - Rebuild node1 and node2 replica nodes.
   ```
   patronictl -c /etc/patroni/patroni.yml reinit pg-ha-cluster node1 node2 --force
   ```
@@ -669,7 +669,7 @@ patronictl -c /etc/patroni/patroni.yml failover pg-ha-cluster --candidate node3 
   Success: reinitialize for member node1 </br>
   Success: reinitialize for member node2 </br>
 
-  Rebuild only node1 replica nodes.
+  - Rebuild only node1 replica nodes.
   ```
   patronictl -c /etc/patroni/patroni.yml reinit pg-ha-cluster node1 --force
   ```
@@ -679,43 +679,42 @@ patronictl -c /etc/patroni/patroni.yml failover pg-ha-cluster --candidate node3 
   patronictl -c /etc/patroni/patroni.yml reload pg-ha-cluster  --force
   ```
   | Member | Host           | Role    | State     | TL | Lag in MB |
-|--------|----------------|---------|-----------|----|-----------|
-| node1  | 192.168.17.133 | Replica | streaming | 36 |         0 |
-| node2  | 192.168.17.134 | Replica | streaming | 36 |         0 |
-| node3  | 192.168.17.135 | Leader  | running   | 36 |           |
-
-Reload request received for member node1 and will be processed within 10 seconds </br>
-Reload request received for member node2 and will be processed within 10 seconds </br>
-Reload request received for member node3 and will be processed within 10 seconds </br>
+  |--------|----------------|---------|-----------|----|-----------|
+  | node1  | 192.168.17.133 | Replica | streaming | 36 |         0 |
+  | node2  | 192.168.17.134 | Replica | streaming | 36 |         0 |
+  | node3  | 192.168.17.135 | Leader  | running   | 36 |           |
+  
+  Reload request received for member node1 and will be processed within 10 seconds </br>
+  Reload request received for member node2 and will be processed within 10 seconds </br>
+  Reload request received for member node3 and will be processed within 10 seconds </br>
 
 - patronictl remove removes information of the cluster from the DCS.
-  ``
+  ```
   patronictl -c /etc/patroni/patroni.yml remove pg-ha-cluster
-  ``
+  ```
 
-  - patronictl restart requests a restart of the Postgres instance managed by a member of the Patroni.
-
-    -Restart all members of the cluster immediately: 
+- patronictl restart requests a restart of the Postgres instance managed by a member of the Patroni.
+  - Restart all members of the cluster immediately: 
     ```
     patronictl -c /etc/patroni/patroni.yml restart pg-ha-cluster --force
     ```
-    - Restart a random member of the cluster immediately:
+  - Restart a random member of the cluster immediately:
     ```
     patronictl -c /etc/patroni/patroni.yml restart pg-ha-cluster --any --force
     ```
-    - Schedule a restart to occur at 2023-09-13T18:00-03:00:
+  - Schedule a restart to occur at 2023-09-13T18:00-03:00:
       ```
       patronictl -c /etc/patroni/patroni.yml restart pg-ha-cluster --scheduled 2023-09-13T18:00-03:00 --force
       ```
-  - patronictl resume takes the Patroni cluster out of maintenance mode and re-enables automatic.
+- patronictl resume takes the Patroni cluster out of maintenance mode and re-enables automatic.
     ```
     patronictl -c /etc/patroni/patroni.yml resume pg-ha-cluster --wait
     ```
-  - patronictl show-config shows the dynamic configuration of the cluster that is stored in the DCS.
+- patronictl show-config shows the dynamic configuration of the cluster that is stored in the DCS.
     ```
     patronictl -c /etc/patroni/patroni.yml show-config pg-ha-cluster
     ```
-  - 
+  
   
 ## 5.	HaProxy Setup
 
