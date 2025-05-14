@@ -678,15 +678,15 @@ patronictl -c /etc/patroni/patroni.yml failover pg-ha-cluster --candidate node3 
   ```
   patronictl -c /etc/patroni/patroni.yml reload pg-ha-cluster  --force
   ```
-  | Member      | Host           | Role    | State     | TL | Lag in MB |
-  |-------------|----------------|---------|-----------|----|-----------|
-  | postgresql0 | 127.0.0.1:5432 | Leader  | running   |  5 |           |
-  | postgresql1 | 127.0.0.1:5433 | Replica | streaming |  5 |         0 |
-  | postgresql2 | 127.0.0.1:5434 | Replica | streaming |  5 |         0 |
-  
-  Reload request received for member postgresql0 and will be processed within 10 seconds</br>
-  Reload request received for member postgresql1 and will be processed within 10 seconds</br>
-  Reload request received for member postgresql2 and will be processed within 10 seconds</br>
+  | Member | Host           | Role    | State     | TL | Lag in MB |
+|--------|----------------|---------|-----------|----|-----------|
+| node1  | 192.168.17.133 | Replica | streaming | 36 |         0 |
+| node2  | 192.168.17.134 | Replica | streaming | 36 |         0 |
+| node3  | 192.168.17.135 | Leader  | running   | 36 |           |
+
+Reload request received for member node1 and will be processed within 10 seconds </br>
+Reload request received for member node2 and will be processed within 10 seconds </br>
+Reload request received for member node3 and will be processed within 10 seconds </br>
 
 - patronictl remove removes information of the cluster from the DCS.
   ``
