@@ -642,6 +642,10 @@ patronictl -c /etc/patroni/patroni.yml failover pg-ha-cluster --candidate node3 
   ```
   patronictl -c /etc/patroni/patroni.yml query pg-ha-cluster -U postgres --password -c "SELECT now()"
   ```
+- Show PostgreSQL parameter.
+  ```
+  patronictl -c /etc/patroni/patroni.yml query pg-ha-cluster -U postgres --password -c "SHOW max_connections"
+  ```
   
 ## 5.	HaProxy Setup
 
