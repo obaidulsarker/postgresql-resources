@@ -105,6 +105,8 @@ data loss after a database system outage.</br>
   - Install pgbackrest on all servers [pgbackrest, node1, node2 and node3].
     ```
     sudo dnf install -y epel-release
+    sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    sudo dnf -qy module disable postgresql
     sudo dnf install pgbackrest -y
     ```
 - Take backup existing config file [/etc/pgbackrest.conf] if any, on all servers [pgbackrest, node1, node2 and node3].
