@@ -369,6 +369,11 @@ data loss after a database system outage.</br>
     # DROP DATABASE test2;
     # \l
     ```
+  - Turn off WAL restore_command (Reset) before point in time restoration
+    ```
+    # patronictl -c /etc/patroni/patroni.yml edit-config pg-ha-cluster --pg restore_command=""
+    # patronictl -c /etc/patroni/patroni.yml restart pg-ha-cluster
+    ```
   - Restore the demo cluster to "2025-05-05 15:37:03.157376+00"
     ```
     # sudo -u postgres pgbackrest --stanza=patroni_backup --delta \
