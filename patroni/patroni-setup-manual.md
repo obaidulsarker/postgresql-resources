@@ -333,6 +333,13 @@ dnf install patroni
 dnf install python-etcd
 systemctl enable patroni
 
+# Upgrdae python version
+sudo dnf update
+sudo dnf install python3.12-pip -y
+sudo alternatives --install /usr/bin/python python /usr/bin/python3.12 10
+python --version
+python3.12 -m pip install patroni[etcd]
+
 ```
 - #### Create a configuration file and the necessary directories for Patroni on node1, node2 and node3 servers.
   ```
